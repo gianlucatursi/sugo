@@ -1,35 +1,32 @@
 <img src="https://raw.githubusercontent.com/gianlucatursi/sugo/master/docs/statics/img/logo.png" width="300">
 
-An Angular module that gives you access to the browsers local storage
+An Angular module that allows modeling, syncing and storage data easily.
 
 [![Bower version][bower-image]][bower-image]
-[![Build status][travis-image]][travis-url]
-[![Test coverage][coveralls-image]][coveralls-url]
 [![Dependency Status][david-image]][david-url]
 [![License][license-image]][license-url]
 
 ##Table of contents:
 - [Get Started](#get-started)
 - [API Documentation](#api-documentation)
-	- [SugoSchema](#api-documentation)
-	- [SugoModel](#api-documentation)
-	- [SugoElement](#api-documentation)
+	- [SugoSchema](#sugoschema)
+	- [SugoModel](#sugomodel)
+	- [SugoElement](#sugoelement)
+- [Examples](#demo)	
+- [TODO](#todo)
+- [Contributors](#contributors)
+- [LICENSE](#license)
 
+<a name="get-started"></a>
 ##Get Started
-**(1)** You can install angular-local-storage using 3 different ways:<br/>
-**Git:**
-clone & build [this](https://github.com/grevory/angular-local-storage.git) repository<br/>
-**Bower:**
+**(1)** You can install `$sugo` using bower:<br/>
 ```bash
-$ bower install angular-local-storage --save
+$ bower install sugo --save
 ```
-**npm:**
-```bash
-$ npm install angular-local-storage
-```
-**(2)** Include `angular-local-storage.js` (or `angular-local-storage.min.js`) from the [dist](https://github.com/grevory/angular-local-storage/tree/master/dist) directory in your `index.html`, after including Angular itself.
 
-**(3)** Add `'LocalStorageModule'` to your main module's list of dependencies.
+**(2)** Include `src/sugo.js` (or `dist/sugo.min.js`) from the [dist](https://github.com/gianlucatursi/sugo/tree/master/dist) (not ready) directory in your `index.html`, after including Angular itself.
+
+**(3)** Add `'sugo'` to your main module's list of dependencies.
 
 When you're done, your setup should look similar to the following:
 
@@ -41,340 +38,66 @@ When you're done, your setup should look similar to the following:
 </head>
 <body>
     ...
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
-    <script src="bower_components/js/angular-local-storage.min.js"></script>
+    <script src="../angular.min.js"></script>
+    <script src="bower_components/sugo/src/sugo.js"></script>
     ...
     <script>
-        var myApp = angular.module('myApp', ['LocalStorageModule']);
+        var myApp = angular.module('myApp', ['sugo']);
 
     </script>
     ...
 </body>
 </html>
 ```
-##Configuration
-###setPrefix
-You could set a prefix to avoid overwriting any local storage variables from the rest of your app<br/>
-**Default prefix:** `ls.<your-key>`
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setPrefix('yourAppName');
-});
-```
-###setStorageType
-You could change web storage type to localStorage or sessionStorage<br/>
-**Default storage:** `localStorage`
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setStorageType('sessionStorage');
-});
-```
-###setDefaultToCookie
-If localStorage is not supported, the library will default to cookies instead. This behavior can be disabled.<br/>
-**Default:** `true`
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setDefaultToCookie(false);
-});
-```
-###setStorageCookie
-Set cookie options (usually in case of fallback)<br/>
-**expiry:** number of days before cookies expire (0 = session cookie). **default:** `30`<br/>
-**path:** the web path the cookie represents. **default:** `'/'`<br/>
-**secure:** whether to store cookies as secure. **default:** `false`
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setStorageCookie(45, '<path>', false);
-});
-```
-###setStorageCookieDomain
-Set the cookie domain, since this runs inside a the `config()` block, only providers and constants can be injected.  As a result, `$location` service can't be used here, use a hardcoded string or `window.location`.<br/>
-**No default value**
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setStorageCookieDomain('<domain>');
-});
-```
-
-For local testing (when you are testing on localhost) set the domain to an empty string ''. Setting the domain to 'localhost' will not work on all browsers (eg. Chrome) since some browsers only allow you to set domain cookies for registry controlled domains, i.e. something ending in .com or so, but not IPs **or intranet hostnames** like localhost. </br>
-
-###setNotify
-
-Configure whether events should be broadcasted on $rootScope for each of the following actions:<br/>
-**setItem** , default: `true`, event "LocalStorageModule.notification.setitem"<br/>
-**removeItem** , default: `false`, event "LocalStorageModule.notification.removeitem"
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setNotify(true, true);
-});
-```
-###Configuration Example
-Using all together
-```js
-myApp.config(function (localStorageServiceProvider) {
-  localStorageServiceProvider
-    .setPrefix('myApp')
-    .setStorageType('sessionStorage')
-    .setNotify(true, true)
-});
-```
+<a name="api-documentation"></a>
 ##API Documentation
-##isSupported
-Checks if the browser support the current storage type(e.g: `localStorage`, `sessionStorage`).
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  if(localStorageService.isSupported) {
-    //...
-  }
-  //...
-});
-```
-###getStorageType
-**Returns:** `String`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  var storageType = localStorageService.getStorageType(); //e.g localStorage
-  //...
-});
-```
-You can also dynamically change storage type by passing the storage type as the last parameter for any of the API calls. For example: `localStorageService.set(key, val, "sessionStorage");`
-###set
-Directly adds a value to local storage.<br/>
-If local storage is not supported, use cookies instead.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function submit(key, val) {
-   return localStorageService.set(key, val);
-  }
-  //...
-});
-```
-###get
-Directly get a value from local storage.<br/>
-If local storage is not supported, use cookies instead.<br/>
-**Returns:** `value from local storage`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function getItem(key) {
-   return localStorageService.get(key);
-  }
-  //...
-});
-```
-###keys
-Return array of keys for local storage, ignore keys that not owned.<br/>
-**Returns:** `value from local storage`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  var lsKeys = localStorageService.keys();
-  //...
-});
-```
-###remove
-Remove an item(s) from local storage by key.<br/>
-If local storage is not supported, use cookies instead.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function removeItem(key) {
-   return localStorageService.remove(key);
-  }
-  //...
-  function removeItems(key1, key2, key3) {
-   return localStorageService.remove(key1, key2, key3);
-  }
-});
-```
-###clearAll
-Remove all data for this app from local storage.<br/>
-If local storage is not supported, use cookies instead.<br/>
-**Note:** Optionally takes a regular expression string and removes matching.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function clearNumbers(key) {
-   return localStorageService.clearAll(/^\d+$/);
-  }
-  //...
-  function clearAll() {
-   return localStorageService.clearAll();
-  }
-});
-```
-###bind
-Bind $scope key to localStorageService.
-**Usage:** `localStorageService.bind(scope, property, value[optional], key[optional])`
-***key:*** The corresponding key used in local storage
-**Returns:** deregistration function for this listener.
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  localStorageService.set('property', 'oldValue');
-  $scope.unbind = localStorageService.bind($scope, 'property');
 
-  //Test Changes
-  $scope.update = function(val) {
-    $scope.property = val;
-    $timeout(function() {
-      alert("localStorage value: " + localStorageService.get('property'));
-    });
-  }
-  //...
-});
-```
-```html
-<div ng-controller="MainCtrl">
-  <p>{{property}}</p>
-  <input type="text" ng-model="lsValue"/>
-  <button ng-click="update(lsValue)">update</button>
-  <button ng-click="unbind()">unbind</button>
-</div>
-```
+<a name="sugoschema"></a>
+##SugoSchema
 
-###deriveKey
-Return the derive key
-**Returns** `String`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  localStorageService.set('property', 'oldValue');
-  //Test Result
-  console.log(localStorageService.deriveKey('property')); // ls.property
-  //...
-});
-```
-###length
-Return localStorageService.length, ignore keys that not owned.
-**Returns** `Number`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  var lsLength = localStorageService.length(); // e.g: 7
-  //...
-});
-```
-##Cookie
-Deal with browser's cookies directly.
-##cookie.isSupported
-Checks if cookies are enabled in the browser.
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  if(localStorageService.cookie.isSupported) {
-    //...
-  }
-  //...
-});
-```
-###cookie.set
-Directly adds a value to cookies.<br/>
-**Note:** Typically used as a fallback if local storage is not supported.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function submit(key, val) {
-   return localStorageService.cookie.set(key, val);
-  }
-  //...
-});
-```
-**Cookie Expiry** Pass a third argument to specify number of days to expiry
-```js
-    localStorageService.cookie.set(key,val,10)
-```
-sets a cookie that expires in 10 days.
-**Secure Cookie** Pass a fourth argument to set the cookie as secure [W3C](https://www.w3.org/TR/csp-cookies/#grammardef-secure)
-```js
-    localStorageService.cookie.set(key,val,null,false)
-```
-sets a cookie that is secure.
-###cookie.get
-Directly get a value from a cookie.<br/>
-**Returns:** `value from local storage`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function getItem(key) {
-   return localStorageService.cookie.get(key);
-  }
-  //...
-});
-```
-###cookie.remove
-Remove directly value from a cookie.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function removeItem(key) {
-   return localStorageService.cookie.remove(key);
-  }
-  //...
-});
-```
-###cookie.clearAll
-Remove all data for this app from cookie.<br/>
-**Returns:** `Boolean`
-```js
-myApp.controller('MainCtrl', function($scope, localStorageService) {
-  //...
-  function clearAll() {
-   return localStorageService.cookie.clearAll();
-  }
-});
-```
+<a name="sugoclass"></a>
+##SugoClass
 
-Check out the full demo at http://gregpike.net/demos/angular-local-storage/demo.html
+<a name="sugoelement"></a>
+##SugoElement
 
-##Development:
-* Don't forget about tests.
-* If you're planning to add some feature please create an issue before.
+<a name="examples"></a>
+##Examples
+Open `index.html` for a simply example.
 
-Clone the project:
-```sh
-$ git clone https://github.com/<your-repo>/angular-local-storage.git
-$ npm install
-$ bower install
-```
-Run the tests:
-```sh
-$ grunt test
-```
-**Deploy:**<br/>
-Run the build task, update version before(bower,package)
-```sh
-$ npm version patch|minor|major
-$ grunt dist
-$ git commit [message]
-$ git push origin master --tags
-```
+<a name="todo"></a>
+##TODO
+
+- **Data validation** with the schema
+- **Data sync** with "server". An user can write its code for its backend and this will run after `sugo` model save/update/delete etc.. 
+- Improving **storage** (using [lz-string](http://pieroxy.net/blog/pages/lz-string/index.html))
+- Native plugins for **iOS & Android** to Storage Data
+- Documentation
+- Tests
+- of course, **bug** fixes
+
+<a name="contributors"></a>
+##Contributors
+
+<a name="license"></a>
+##LICENSE
+The MIT License
+
+Copyright (c) 2016 Gianluca Tursi http://www.gianlucatursi.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
 [bower-image]: https://img.shields.io/bower/v/sugo.svg?style=flat-square
-
 [bower-url]: https://npmjs.org/package/angular-local-storage
-[travis-image]: https://img.shields.io/travis/gianlucatursi/sugo.svg?style=flat-square
-[travis-url]: https://travis-ci.org/grevory/angular-local-storage
-[coveralls-image]: https://img.shields.io/coveralls/grevory/angular-local-storage.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/r/gianlucatursi/sugo
+
 [david-image]: http://img.shields.io/david/gianlucatursi/sugo.svg?style=flat-square
 [david-url]: https://david-dm.org/gianlucatursi/sugo
+
 [license-image]: http://img.shields.io/npm/l/sugo.svg?style=flat-square
 [license-url]: LICENSE
-[downloads-image]: http://img.shields.io/npm/dm/sugo.svg?style=flat-square
-[downloads-url]: https://npmjs.org/package/sugo
