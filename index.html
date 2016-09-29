@@ -1,0 +1,114 @@
+<html ng-app="myApp">
+	<head>
+		<title>Sugo</title>
+		<script src="bower_components/angular/angular.min.js"></script>
+		<script src="src/sugo.js"></script>
+		<script src="bower_components/underscore/underscore-min.js"></script>
+	</head>
+	<body ng-controller="MainController as main">
+
+		<h1>{{main.productModel.name()}}</h1>
+			<ul>
+				<li ng-repeat="product in main.products">
+				{{product.title}} - {{product.created_at | date:"medium"}}
+				<button ng-click="product.delete()">delete</button>
+				</li>
+			</ul>
+		<button ng-click="main.addProduct()">Add product</button>
+		<h1>{{main.second.name()}}</h1>
+
+		<input type="text" ng-model="productSearch" ng-init="productSearch = 'Product #'">
+		<button ng-click="main.search(productSearch)">Search by title</button>
+
+
+		<h4>Founded: {{ main.founded.toString({title:1}) }}</h4>
+	</body>
+</html>
+
+<script>
+
+(function(){
+
+	var app = angular.module('myApp', ['sugo']);
+
+	app.controller('MainController', ['$scope','$sugo', function($scope, $sugo){
+
+		var _this = this;
+		_this.scope = $scope;
+		_this.products = {};
+		_this.addProduct = _addProduct;
+		_this.search = _search;
+		_this.founded = undefined;
+
+		var VariantSchema = new $sugo.schema({
+			title : String,
+			color: String,
+			quantity: Number
+		});
+
+		var ProductSchema = new $sugo.schema({
+			title: String,
+			variants: [VariantSchema]
+		});
+
+		_this.productModel = $sugo.model('Product', ProductSchema);
+		_this.variantsModel = $sugo.model('Variants', VariantSchema);
+
+		//init data
+		_getAll();
+		
+		/**
+		 * Add product
+		 */
+		function _addProduct(){
+			_this
+				.productModel
+				.insert({
+					title: "Product #" + Object.keys(_this.products).length, 
+					listings:[]
+				})
+				.then(
+					_getAll, 
+					function(error){
+						console.error(error);
+					});
+		}
+
+		/**
+		 * [_getAll description]
+		 * @return {[type]} [description]
+		 */
+		function _getAll(){
+			_this
+				.productModel
+				.find()
+				.then(
+					function(result){
+						_this.products = result;
+					}, 
+					function(error){
+						console.error(error);
+					});	
+		}
+		/**
+		 * Find element
+		 * @param  {[type]} index [description]
+		 * @return {[type]}       [description]
+		 */
+		function _search(title){
+			_this
+				.productModel
+				.findOne({title: title})
+				.then(
+					function(result){
+						_this.founded = result;
+						result.save();
+					},
+					function(error){
+						_this.founded = undefined;
+					})
+		}
+	}]);
+})(window);
+
+</script>
