@@ -4,13 +4,14 @@
     "keywords": [
         "angular",
         "data",
-        "model"
+        "model",
+        "modeling",
+        "storage"
     ],
     "license": "MIT",
     "ignore": [],
-    "description": "",
+    "description": "Elegant data modeling and storage for AngularJS",
     "version": "0.0.1",
-    "main": ["./dist/sugo.min.js"],
     "dependencies": {
         "angular": ">=1.3.0",
         "underscore" : ">=0.1.0"
