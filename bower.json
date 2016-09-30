@@ -1,7 +1,7 @@
 {
   "name": "sugo",
   "description": "Elegant data modeling and storage for AngularJS",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": [
     "Gianluca Tursi <gian.tursi@gmail.com>"
   ],

@@ -86,7 +86,7 @@ Now we have define a new `SugoSchema` for our model.
 After creating the `Schema` we should create a model for that schema.
 
 ```javascript
-var Users = new $sugo.model('Users', Person);
+var Users = $sugo.model('Users', Person);
 ```
 
 This define a new model `Users` and each document of `Users` are structured as a `Person`.
@@ -95,13 +95,13 @@ This define a new model `Users` and each document of `Users` are structured as a
 Once we have define a model through `$sugo.model('Users', Person)` we can access it through the same function:
 
 ```javascript
-var Users = new $sugo.model('Users', Person);
+var Users = $sugo.model('Users', Person);
 ```
 
 or without using the schema:
 
 ```javascript
-var Users = new $sugo.model('Users');
+var Users = $sugo.model('Users');
 ```
 
 `$sugo` will create the model for your Users and your Users collection (if doesn't exist) in the localStorage.
@@ -167,7 +167,7 @@ schema.define({
 
 ### schema.validate()
 
-Used when you insert a new element from model (or element it self)
+Used when you insert a new element from model (or element it self)  
 **@param** `Object` data to validate  
 **@return** `Object`   
 **FIXME** At the moment the validation don't check the types (es: { title: String } if we pass { title: 1} it's valid).
@@ -314,6 +314,7 @@ model
 ```
 ### model.migrate()
 Used for migrate from a schema to a new one.
+
 **@param** `$sugo.schema` the new schema for the model  
 ```javascript
 $sugo.model(<MODEL>).migrate(<SCHEMA>);
@@ -348,6 +349,7 @@ element.delete();
 ```
 ### element.toString()
 Return the element as a String
+
 **@param** `Object`  each key is a selection and if the value is 1 return only that key. If is `undefined` or empty return the object  
 **FIXME** to improve  
 ```javascript```
