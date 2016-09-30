@@ -158,7 +158,7 @@ Used for re-define a schema or create a new one.
 
 **WARNING:** If you change an existing schema (associated with a model with a stored data) the data are re-validated with the new schema only after calling `$sugo.model(<MODEL>).migrate(<NEW_SCHEMA>)`).
 
-**@param** `Object` definition of the schema
+**@param** `Object` definition of the schema  
 ```javascript
 schema.define({
     <key>: <type>
@@ -168,8 +168,8 @@ schema.define({
 ### schema.validate()
 
 Used when you insert a new element from model (or element it self)
-**@param** `Object` data to validate
-**@return** `Object` 
+**@param** `Object` data to validate  
+**@return** `Object`   
 **FIXME** At the moment the validation don't check the types (es: { title: String } if we pass { title: 1} it's valid).
 
 ```javascript
@@ -198,9 +198,9 @@ if(Users.schema.validate(sister)){
 ### $sugo.model()
 Constructor for create, or get, a new model
 
-**@param** `String` _name of the model
-**@param** `$sugo.schema` sugo_schema instance of `$sugo.schema`
-**@return** `$sugo.model` instance of `$sugo.model`
+**@param** `String` _name of the model  
+**@param** `$sugo.schema` sugo_schema instance of `$sugo.schema`  
+**@return** `$sugo.model` instance of `$sugo.model`  
 ```javascript
 var model = $sugo.model('Users', <SCHEMA>);
 ```
@@ -219,8 +219,8 @@ model.name(); //Users
 ### model.new()
 Create a new instance of the element of the model
 
-**@param**  `Object` value of the new object
-**@return** `$sugo.element` instance of a new element
+**@param**  `Object` value of the new object  
+**@return** `$sugo.element` instance of a new element  
 
 ```javascript
 var me = model.new({
@@ -235,8 +235,8 @@ var me = model.new({
 Used for insert a new element in the model (automatically stored)
 When the insert is complete the model its automatically updated.
 
-**@param** `Object` the data to insert
-**@return** `Promise` in success callback there is the instance of `$sugo.element` of the object inserted. 
+**@param** `Object` the data to insert  
+**@return** `Promise` in success callback there is the instance of `$sugo.element` of the object inserted.   
 In fail callback there is an {Object} with two key : `message` and `schema`<br>
 ```javascript
 model
@@ -255,8 +255,8 @@ model
 Used for update a `$sugo.element` in the model and in localStorage.
 When the update is complete the model its automatically updated.
 
-**@param** `$sugo.element` the instance of sugo element to update
-**@return** `Promise` in success callback there is the instance of `$sugo.element` of the object updatated. 
+**@param** `$sugo.element` the instance of sugo element to update  
+**@return** `Promise` in success callback there is the instance of `$sugo.element` of the object updatated.   
 In fail callback there is an {Object} with two key : `message` and `schema`<br>
 
 ```javascript
@@ -271,8 +271,8 @@ model
 Used for delete a `$sugo.element` in the model and in localStorage.
 When the update is complete the model its automatically updated.
 
-**@param** `$sugo.element` the instance of sugo element to delete
-**@return** `Promise` in success callback there is the instance of `$sugo.element` deleted. 
+**@param** `$sugo.element` the instance of sugo element to delete  
+**@return** `Promise` in success callback there is the instance of `$sugo.element` deleted.   
 In fail callback there is an {Object} with the error<br>
 
 ```javascript
@@ -287,9 +287,9 @@ model
 ### model.find()
 Used for find `$sugo.elements` in the model.
 
-**@param** `Object` the query (es: `{name: "Gianluca"}`. TODO: more operators like `mongodb`: `{$gte: ""}`)
+**@param** `Object` the query (es: `{name: "Gianluca"}`. TODO: more operators like `mongodb`: `{$gte: ""}`)  
 **@return** `Promise` in success callback there is, always an array, the list of `$sugo.element` founded. 
-In fail callback there is an {Object} with two key : `message` and `query`<br>
+In fail callback there is an {Object} with two key : `message` and `query`  
 If the param is empty `$sugo` return all documents
 
 ```javascript
@@ -314,7 +314,7 @@ model
 ```
 ### model.migrate()
 Used for migrate from a schema to a new one.
-**@param** `$sugo.schema` the new schema for the model
+**@param** `$sugo.schema` the new schema for the model  
 ```javascript
 $sugo.model(<MODEL>).migrate(<SCHEMA>);
 ```
@@ -348,8 +348,8 @@ element.delete();
 ```
 ### element.toString()
 Return the element as a String
-**@param** `Object`  each key is a selection and if the value is 1 return only that key. If is `undefined` or empty return the object
-**FIXME** to improve
+**@param** `Object`  each key is a selection and if the value is 1 return only that key. If is `undefined` or empty return the object  
+**FIXME** to improve  
 ```javascript```
 // return only for example: {name: "Gianluca"}
 element.toString({ name: 1});
