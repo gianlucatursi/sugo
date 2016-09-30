@@ -29,7 +29,7 @@
       function _createModel(identifier, sugo_schema) {
         var correctName = identifier.toLowerCase().capitalized();
         var name = "$sugo." + correctName;
-        if (name in models) {
+        if (!sugo_schema || name in models) {
           return models[name];
         } else {
           models[name] = new SugoClass(correctName, sugo_schema);
@@ -42,6 +42,7 @@
       /**
        * Sugo Model Constructor
        * @param {[type]} _name [description]
+       * @param {[type]} sugo_schema [description]
        * @param SugoSchema sugo_schema
        */
       function SugoClass(_name, sugo_schema){
@@ -66,6 +67,15 @@
        */
       SugoClass.prototype.name = function(){
         return this.model_name;
+      }
+
+      /**
+       * Create a new instance of the element of the model
+       * @param  {[type]} value [description]
+       * @return {[type]}       [description]
+       */
+      SugoClass.prototype.new = function(value){
+        return new SugoElement(value || {}, this);
       }
 
       /**
@@ -106,10 +116,12 @@
           $sugoStorage.setObject(that.name(), that.elements, that.schema);
 
           defer.resolve({});
-        }else{
-          defer.reject({
+        }else{ // to add
+
+          return this.insert(sugo_element);
+          /*defer.reject({
             message: "Element not found"
-          });
+          });*/
         }
 
         return defer.promise;
@@ -181,6 +193,24 @@
         return defer.promise;
 
       };
+
+      /**
+       * Migrate data with a new schema
+       * @return {[type]} [description]
+       */
+      SugoClass.prototype.migrate = function(new_schema){
+        var oldElement = $sugoStorage.getObject(_name);
+        var that = this;
+
+        that.schema = new_schema;
+        that.elements = {};
+
+        _.each(oldElement, function(value, key){
+          var newElement = new SugoElement(value, that, key);
+          that.elements[key] = newElement;
+        });
+
+      }
       /*** FIXME: USER IN THAT FUNCTION CAN USE this? maybe can know how to use it
 
        /**
@@ -244,10 +274,26 @@
       /**
        * CRUD FUNCTIONS Save, Update, Get, Obliterate(?? fa schifo) = SUGO ;)
        */
+      /**
+       * Save element
+       * @return {[type]} [description]
+       */
       SugoElement.prototype.save = function(){
         return this._private.sugo.update(this);
       }
 
+      /**
+       * Update element
+       * @return {[type]} [description]
+       */
+      SugoElement.prototype.update = function(){
+        return this._private.sugo.update(this);
+      }
+
+      /**
+       * Delete element
+       * @return {[type]} [description]
+       */
       SugoElement.prototype.delete = function(){
         return this._private.sugo.delete(this);
       }
@@ -281,7 +327,7 @@
        */
       function SugoSchema(dataSchema){
 
-        if(_isNotValid(dataSchema)){
+        if(_isNotValid(dataSchema || {})){
           throw "Schema not valid: Object-> " + JSON.stringify(dataSchema);
           return;
         }
@@ -295,8 +341,8 @@
        * @param  {[type]} dataSchema [description]
        * @return {[type]}            [description]
        */
-      SugoSchema.prototype.create = function(dataSchema){
-        if(_isNotValid(dataSchema)){
+      SugoSchema.prototype.define = function(dataSchema){
+        if(_isNotValid(dataSchema || {})){
           throw "Schema not valid: Object-> " + JSON.stringify(dataSchema);
           return;
         }
@@ -310,7 +356,7 @@
        * @return {Object}      if the data is valid return the correct fields to save otherwise throw exception
        */
       SugoSchema.prototype.validate = function(data){
-        var object = JSON.parse(JSON.stringify(data));
+        var object = _(data).clone();
         var isValid = true;
         var that = this;
         // remove all keys useless

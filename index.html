@@ -45,20 +45,30 @@
 			color: String,
 			quantity: Number
 		});
-
+		/** New Product Schema */
 		var ProductSchema = new $sugo.schema({
 			title: String,
-			variants: [VariantSchema]
+			/** TODO: variants: [VariantSchema] */
 		});
 
+		// define model
 		_this.productModel = $sugo.model('Product', ProductSchema);
-		_this.variantsModel = $sugo.model('Variants', VariantSchema);
+		//_this.variantsModel = $sugo.model('Variants', VariantSchema);
 
 		//init data
 		_getAll();
 		
+		/** Add new element from instance */
+		// create instance
+		var element = _this.productModel.new({title: 'Hello World'});
+		// save into collection after a while
+		setTimeout(function(){
+			element.save();
+			_this.scope.$apply();
+		}, 2000);
+		
 		/**
-		 * Add product
+		 * Add product with a insert query
 		 */
 		function _addProduct(){
 			_this
@@ -75,7 +85,7 @@
 		}
 
 		/**
-		 * [_getAll description]
+		 * Get all products
 		 * @return {[type]} [description]
 		 */
 		function _getAll(){
@@ -91,7 +101,7 @@
 					});	
 		}
 		/**
-		 * Find element
+		 * Find element with a query
 		 * @param  {[type]} index [description]
 		 * @return {[type]}       [description]
 		 */
