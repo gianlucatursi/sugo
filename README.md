@@ -391,7 +391,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 [bower-image]: https://img.shields.io/bower/v/sugo.svg?style=flat-square
-[bower-url]: https://npmjs.org/package/angular-local-storage
+[bower-url]: https://github.com/gianlucatursi/sugo
 
 [license-image]: http://img.shields.io/npm/l/sugo.svg?style=flat-square
 [license-url]: LICENSE
